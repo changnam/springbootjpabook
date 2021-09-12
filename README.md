@@ -6,3 +6,7 @@ entity 클래스와 repository 인터페이스 생성 - 실행하면 자동으�
 resources/data.sql 을 만들어 놓으면 자동 실행된다.
 
 DataSourceAutoConfiguration.class 가 적용되었을 시 , 적용되는 것이며, exclude={DataSourceAutoConfiguration.class} 적용시 자동 sql은 수행되지 않음. 수행하고 싶으면 datasourceinitializer 를 사용할것.
+
+spring.jpa.xxx 옵션은 HibernateJpaAutoConfiguration.class 사용시 적용됨( EntityManagerFactory 를 생성하며, 이때 속성으로 사용된다). disable 시 수동설정에서 값들을 셋팅해줘야 한다.
+
+
