@@ -66,9 +66,10 @@ public class MysqlDataSourceConfig {
 		factory.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
 		
 		Properties properties = new Properties();
-		properties.put("hibernate.hbm2ddl.auto","none");
-		properties.put("hibernate.show_sql","true");
-		properties.put("hibernate.format_sql","true");
+		properties.put("hibernate.hbm2ddl.auto",env.getProperty("spring.jpa.hibernate.ddl-auto"));
+		properties.put("hibernate.show_sql",env.getProperty("spring.jpa.properties.hibernate.show_sql"));
+		properties.put("hibernate.format_sql",env.getProperty("spring.jpa.properties.hibernate.format_sql"));
+		properties.put("hibernate.dialect",env.getProperty("mysql.datasource.dialect"));
 		
 		factory.setJpaProperties(properties);
 		factory.setPackagesToScan("com.honsoft.entity");
