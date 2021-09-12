@@ -9,4 +9,4 @@ DataSourceAutoConfiguration.class 가 적용되었을 시 , 적용되는 것이�
 
 spring.jpa.xxx 옵션은 HibernateJpaAutoConfiguration.class 사용시 적용됨( EntityManagerFactory 를 생성하며, 이때 속성으로 사용된다). disable 시 수동설정에서 값들을 셋팅해줘야 한다.
 
-
+hibernate.hbm2ddl.auto 가 create, create-drop 인경우, classpath 에 import.sql 이 있으면 수행함. (중요, 이때 각 sql 이 한줄씩 작성되어야 오류가 없다) 
