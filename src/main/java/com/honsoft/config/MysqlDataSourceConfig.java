@@ -22,12 +22,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.data.transaction.ChainedTransactionManager;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.init.DataSourceInitializer;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.LocalEntityManagerFactoryBean;
+import org.springframework.orm.jpa.vendor.HibernateJpaDialect;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 
@@ -74,6 +76,7 @@ public class MysqlDataSourceConfig {
 		LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
 		factory.setDataSource(mysqlDataSource());
 		factory.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
+		factory.setJpaDialect(new HibernateJpaDialect());
 
 		Properties properties = new Properties();
 		properties.put("hibernate.hbm2ddl.auto", env.getProperty("spring.jpa.hibernate.ddl-auto"));
@@ -88,7 +91,7 @@ public class MysqlDataSourceConfig {
 	}
 
 	@Bean(name = "mysqlJpaTransactionManager")
-	public PlatformTransactionManager mysqlTransactionManager() {
+	public PlatformTransactionManager mysqlJpaTransactionManager() {
 		EntityManagerFactory factory = mysqlEntityManagerFactory().getObject();
 		return new JpaTransactionManager(factory);
 	}
@@ -109,11 +112,6 @@ public class MysqlDataSourceConfig {
 	@Bean(name = "mysqlSqlSessiontemplate")
 	public SqlSessionTemplate mysqlSqlSessionTemplate() throws Exception {
 		return new SqlSessionTemplate(mysqlSqlSessionFactory());
-	}
-
-	@Bean
-	public PlatformTransactionManager mysqlTxManager() {
-		return new DataSourceTransactionManager(mysqlDataSource());
 	}
 
 }
