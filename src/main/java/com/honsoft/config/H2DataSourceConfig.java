@@ -19,6 +19,7 @@ import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
@@ -36,55 +37,56 @@ import org.springframework.transaction.PlatformTransactionManager;
 import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration
-@MapperScan(value = { "com.honsoft.mapper" }, sqlSessionFactoryRef = "mysqlSqlSessionFactory")
-@EnableJpaRepositories(basePackages = {
-		"com.honsoft.repository" }, entityManagerFactoryRef = "mysqlEntityManagerFactory", transactionManagerRef = "mysqlJpaTransactionManager")
-public class MysqlDataSourceConfig {
+//@MapperScan(value = { "com.honsoft.mapper" }, sqlSessionFactoryRef = "h2SqlSessionFactory")
+//@EnableJpaRepositories(basePackages = {
+//		"com.honsoft.repository" }, entityManagerFactoryRef = "h2EntityManagerFactory", transactionManagerRef = "h2JpaTransactionManager")
+public class H2DataSourceConfig {
 	@Autowired
 	private Environment env;
 
 	@Bean
-	@ConfigurationProperties(prefix = "mysql.datasource")
-	public DataSourceProperties mysqlDataSourceProperties() {
+	@ConfigurationProperties(prefix = "h2.datasource")
+	public DataSourceProperties h2DataSourceProperties() {
 		DataSourceProperties properties = new DataSourceProperties();
 
 		return properties;
 	}
 
 	@Bean
-	public DataSource mysqlDataSource() {
-		return mysqlDataSourceProperties().initializeDataSourceBuilder().type(HikariDataSource.class).build();
+	@Primary
+	public DataSource h2DataSource() {
+		return h2DataSourceProperties().initializeDataSourceBuilder().type(HikariDataSource.class).build();
 	}
 
 	@Bean
-	public DataSourceInitializer mysqlDataSourceInitializer(@Qualifier("mysqlDataSource") DataSource dataSource) {
+	public DataSourceInitializer h2DataSourceInitializer(@Qualifier("h2DataSource") DataSource dataSource) {
 		DataSourceInitializer initializer = new DataSourceInitializer();
 		initializer.setDataSource(dataSource);
-		initializer.setEnabled(env.getProperty("mysql.datasource.initialize", Boolean.class, false));
+		initializer.setEnabled(env.getProperty("h2.datasource.initialize", Boolean.class, false));
 
 		ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
-		populator.setSqlScriptEncoding(env.getProperty("mysql.datasource.sql-script-encoding"));
-		populator.addScript(new ClassPathResource("schema-mysql.sql"));
-		populator.addScript(new ClassPathResource("data-mysql.sql"));
+		populator.setSqlScriptEncoding(env.getProperty("h2.datasource.sql-script-encoding"));
+		populator.addScript(new ClassPathResource("schema-h2.sql"));
+		populator.addScript(new ClassPathResource("data-h2.sql"));
 
 		initializer.setDatabasePopulator(populator);
 
 		return initializer;
 	}
 
-	@Bean(name = "mysqlEntityManagerFactory")
-	public LocalContainerEntityManagerFactoryBean mysqlEntityManagerFactory() {
+	@Bean(name = "h2EntityManagerFactory")
+	public LocalContainerEntityManagerFactoryBean h2EntityManagerFactory() {
 		LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
-		factory.setDataSource(mysqlDataSource());
-		factory.setPersistenceUnitName("mysqlUnit");
+		factory.setDataSource(h2DataSource());
+		factory.setPersistenceUnitName("h2Unit");
 		factory.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
 		factory.setJpaDialect(new HibernateJpaDialect());
 
 		Properties properties = new Properties();
-		properties.put("hibernate.hbm2ddl.auto", env.getProperty("mysql.jpa.hibernate.ddl-auto"));
-		properties.put("hibernate.show_sql", env.getProperty("mysql.jpa.hibernate.show_sql"));
-		properties.put("hibernate.format_sql", env.getProperty("mysql.jpa.hibernate.format_sql"));
-		properties.put("hibernate.dialect", env.getProperty("mysql.jpa.hibernate.dialect"));
+		properties.put("hibernate.hbm2ddl.auto", env.getProperty("h2.jpa.hibernate.ddl-auto"));
+		properties.put("hibernate.show_sql", env.getProperty("h2.jpa.hibernate.show_sql"));
+		properties.put("hibernate.format_sql", env.getProperty("h2.jpa.hibernate.format_sql"));
+		properties.put("hibernate.dialect", env.getProperty("h2.jpa.hibernate.dialect"));
 
 		factory.setJpaProperties(properties);
 		factory.setPackagesToScan("com.honsoft.entity");
@@ -92,17 +94,17 @@ public class MysqlDataSourceConfig {
 		return factory;
 	}
 
-	@Bean(name = "mysqlJpaTransactionManager")
-	public PlatformTransactionManager mysqlJpaTransactionManager() {
-		EntityManagerFactory factory = mysqlEntityManagerFactory().getObject();
+	@Bean(name = "h2JpaTransactionManager")
+	public PlatformTransactionManager h2JpaTransactionManager() {
+		EntityManagerFactory factory = h2EntityManagerFactory().getObject();
 		return new JpaTransactionManager(factory);
 	}
 
 	// mybatis
-	@Bean(name = "mysqlSqlSessionFactory")
-	public SqlSessionFactory mysqlSqlSessionFactory() throws Exception {
+	@Bean(name = "h2SqlSessionFactory")
+	public SqlSessionFactory h2SqlSessionFactory() throws Exception {
 		SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
-		sqlSessionFactoryBean.setDataSource(mysqlDataSource());
+		sqlSessionFactoryBean.setDataSource(h2DataSource());
 		org.apache.ibatis.session.Configuration configuration = new org.apache.ibatis.session.Configuration();
 		configuration.setMapUnderscoreToCamelCase(true);
 		configuration.setJdbcTypeForNull(JdbcType.NULL);
@@ -111,9 +113,9 @@ public class MysqlDataSourceConfig {
 		return sqlSessionFactoryBean.getObject();
 	}
 
-	@Bean(name = "mysqlSqlSessiontemplate")
-	public SqlSessionTemplate mysqlSqlSessionTemplate() throws Exception {
-		return new SqlSessionTemplate(mysqlSqlSessionFactory());
+	@Bean(name = "h2SqlSessiontemplate")
+	public SqlSessionTemplate h2SqlSessionTemplate() throws Exception {
+		return new SqlSessionTemplate(h2SqlSessionFactory());
 	}
 
 }

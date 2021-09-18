@@ -7,7 +7,8 @@ import org.springframework.data.repository.CrudRepository;
 
 import com.honsoft.entity.Tutorial;
 
-public interface TutorialRepository extends CrudRepository<Tutorial, Long> {
+public interface TutorialRepository extends JpaRepository<Tutorial, Long> {
 	  List<Tutorial> findByPublished(boolean published);
 	  List<Tutorial> findByTitleContaining(String title);
+	  
 	}

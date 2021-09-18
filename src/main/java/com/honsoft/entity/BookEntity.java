@@ -15,7 +15,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
 
 @Entity
-@Table(name = "book")
+@Table(name = "books")
 public class BookEntity {
 
 	@Id

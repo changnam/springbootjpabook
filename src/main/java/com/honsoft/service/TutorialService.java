@@ -8,6 +8,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,6 @@ public class TutorialService {
 	@Autowired
 	private TutorialRepository tutorialRepository;
 	
-	@PersistenceContext
 	private EntityManager em;
 	
 	@Autowired
@@ -30,6 +30,10 @@ public class TutorialService {
 	
 	@Autowired
 	private JdbcTemplate jdbcTempate;
+	
+	public TutorialService(@Qualifier("mysqlEntityManagerFactory") EntityManager em){
+		this.em = em;
+	}
 	
 	public List<Tutorial> getAll(){
 		return em.createQuery("select t from Tutorial t").getResultList();
